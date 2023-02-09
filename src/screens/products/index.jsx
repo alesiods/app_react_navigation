@@ -1,19 +1,36 @@
 import React from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button, SafeAreaView, FlatList } from 'react-native';
 
 import { styles } from './styles';
-import { theme } from '../../constants/theme';
+import { ProductItem } from '../../components';
+import { PRODUCTS } from '../../constants/data/index';
+import { THEME } from '../../constants/theme';
 
-const Products = ({ navigation }) => {
+const Products = ({ navigation, route }) => {
+  const { categoryId, title } = route.params;
+
+  console.warn(title, categoryId);
+
+  const filteredProducts = PRODUCTS.filter((product) => product.categoryId === categoryId);
+
+  const onSelected = (item) => {
+    navigation.navigate('ProductDetail', {
+      productId: item.id,
+      title: item.title,
+    });
+  };
+
+  const renderItem = ({ item }) => <ProductItem item={item} onSelected={onSelected} />;
+  const keyExtractor = (item) => item.id.toString();
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Productos</Text>
-      <Button
-        title="ver detalle"
-        onPress={() => navigation.navigate('ProductDetail')}
-        color={theme.colors.primary}
+    <SafeAreaView style={styles.container}>
+      <FlatList
+        data={filteredProducts}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        style={styles.contentList}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
